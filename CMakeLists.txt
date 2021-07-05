@@ -4,6 +4,9 @@ cmake_minimum_required (VERSION 3.5)
 
 # Project specification.
 project (GSKNN C CXX)
+
+
+
 set (GSKNN_VERSION_MAJOR 1)
 set (GSKNN_VERSION_MINOR 1)
 set (GSKNN_VERSION_PATCH 0)
@@ -70,44 +73,56 @@ set (CMAKE_CXX_FLAGS    "${CMAKE_CXX_FLAGS} ${GSKNN_CFLAGS}")
 #set (MKL_DIR $ENV{GSKNN_MKL_DIR})
 
 # Headers.
-include_directories ("include" "${CMAKE_SOURCE_DIR}/kernels/${GSKNN_ARCH}" "${MKL_DIR}/include")
-file (GLOB GSKNN_HDRS ${CMAKE_SOURCE_DIR}/include/*)
-install (FILES ${GSKNN_HDRS} DESTINATION ${CMAKE_BINARY_DIR}/include)
+#include_directories(include)
+#include_directories ("include" "${CMAKE_CURRENT_SOURCE_DIR}/kernels/${GSKNN_ARCH}")
+file (GLOB GSKNN_HDRS ${CMAKE_CURRENT_SOURCE_DIR}/include/*)
+#install (FILES ${GSKNN_HDRS} DESTINATION ${CMAKE_BINARY_DIR}/include)
 
 
 # Library dependencies
-file (GLOB FRAME_CC_SRC  ${CMAKE_SOURCE_DIR}/frame/*.c)
-file (GLOB FRAME_CXX_SRC ${CMAKE_SOURCE_DIR}/frame/*.cpp)
-file (GLOB KERNEL_SRC ${CMAKE_SOURCE_DIR}/kernels/${GSKNN_ARCH}/*.c)
+file (GLOB FRAME_CC_SRC  ${CMAKE_CURRENT_SOURCE_DIR}/frame/*.c)
+file (GLOB FRAME_CXX_SRC ${CMAKE_CURRENT_SOURCE_DIR}/frame/*.cpp)
+file (GLOB KERNEL_SRC ${CMAKE_CURRENT_SOURCE_DIR}/kernels/${GSKNN_ARCH}/*.c)
 
 
 # Build the static library.
-add_library (gsknn ${FRAME_CC_SRC} ${FRAME_CXX_SRC} ${KERNEL_SRC})
+add_library (gsknn STATIC ${FRAME_CC_SRC} ${FRAME_CXX_SRC} ${KERNEL_SRC})
+
+target_include_directories(gsknn PUBLIC include)
+set_target_properties(gsknn PROPERTIES PUBLIC_HEADER "${GSKNN_HDRS}")
+set_target_properties(gsknn PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(gsknn PUBLIC kernels/${GSKNN_ARCH})
+install(
+        TARGETS gsknn
+        LIBRARY
+            DESTINATION lib 
+        PUBLIC_HEADER 
+            DESTINATION include
+        )
 
 # Build the executable files.
-add_executable (test_sgsknn.x ${CMAKE_SOURCE_DIR}/test/test_sgsknn.c)
-target_link_libraries(test_sgsknn.x gsknn m)
+#add_executable (test_sgsknn.x ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sgsknn.c)
+#target_link_libraries(test_sgsknn.x gsknn m)
 #target_link_libraries(test_sgsknn.x openblas)
-add_executable (test_sgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_sgsknn_stl.cpp)
-target_link_libraries(test_sgsknn_stl.x gsknn m)
+#add_executable (test_sgsknn_stl.x ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sgsknn_stl.cpp)
+#target_link_libraries(test_sgsknn_stl.x gsknn m)
 #target_link_libraries(test_sgsknn_stl.x openblas)
-add_executable (test_dgsknn.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn.c)
-target_link_libraries(test_dgsknn.x gsknn m)
+#add_executable (test_dgsknn.x ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dgsknn.c)
+#target_link_libraries(test_dgsknn.x gsknn m)
 #target_link_libraries(test_dgsknn.x openblas)
-add_executable (test_dgsknn_stl.x ${CMAKE_SOURCE_DIR}/test/test_dgsknn_stl.cpp)
-target_link_libraries(test_dgsknn_stl.x gsknn m)
+#add_executable (test_dgsknn_stl.x ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dgsknn_stl.cpp)
+#target_link_libraries(test_dgsknn_stl.x gsknn m)
 #target_link_libraries(test_dgsknn_stl.x openblas)
 
 
 # Install shell script
-file (GLOB GSKNN_SCRIPTS ${CMAKE_SOURCE_DIR}/test/*.sh)
-install (FILES ${GSKNN_SCRIPTS} DESTINATION ${CMAKE_BINARY_DIR}/bin)
-
+#file (GLOB GSKNN_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/test/*.sh)
+#install (FILES ${GSKNN_SCRIPTS} DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
 # Report
 message ("===================================================")
 message ("Version      =${GSKNN_VERSION}")
-message ("Source       =${CMAKE_SOURCE_DIR}")
+message ("Source       =${CMAKE_CURRENT_SOURCE_DIR}")
 message ("Target       =${CMAKE_BINARY_DIR}")
 message ("KS_ARCH      =${GSKNN_ARCH}")
 message ("CC           =${CMAKE_C_COMPILER}")
