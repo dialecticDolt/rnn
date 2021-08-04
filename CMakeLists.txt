@@ -37,8 +37,17 @@ ENABLE_TESTING()
 
 
 # Decide architecture
+
 set (GSKNN_ARCH_MAJOR $ENV{GSKNN_ARCH_MAJOR})
+if(NOT GSKNN_ARCH_MAJOR)
+    set(GSKNN_ARCH_MAJOR "x86_64")
+endif()
+    
 set (GSKNN_ARCH_MINOR $ENV{GSKNN_ARCH_MINOR})
+if(NOT GSKNN_ARCH_MINOR)
+    set(GSKNN_ARCH_MINOR "sandybridge")
+endif()
+
 set (GSKNN_ARCH ${GSKNN_ARCH_MAJOR}/${GSKNN_ARCH_MINOR})
 
 message("Compiler ID: ${CMAKE_C_COMPILER_ID}")
