@@ -30,7 +30,7 @@ set (CMAKE_DEBUG_POSTFIX "-debug")
 #  message(WARNING "Target processor architecture ${CMAKE_SYSTEM_PROCESSOR} is not supported in GSKNN.")
 #  set(SUPPORTED_PLATFORM false)
 #endif()
-  
+
 
 # Turn on testing.
 ENABLE_TESTING()
@@ -43,7 +43,7 @@ if(DEFINED ENV{GSKNN_ARCH_MAJOR})
 else()
     set(GSKNN_ARCH_MAJOR "x86_64")
 endif()
-    
+
 if(DEFINED ENV{GSKNN_ARCH_MINOR})
     set(GSKNN_ARCH_MINOR $ENV{GSKNN_ARCH_MINOR})
 else()
@@ -106,8 +106,8 @@ target_include_directories(gsknn PUBLIC kernels/${GSKNN_ARCH})
 install(
         TARGETS gsknn
         LIBRARY
-            DESTINATION lib 
-        PUBLIC_HEADER 
+            DESTINATION lib
+        PUBLIC_HEADER
             DESTINATION include
         )
 

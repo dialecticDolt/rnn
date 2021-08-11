@@ -33,7 +33,7 @@
  *
  * Modification:
  *
- * 
+ *
  * */
 
 
@@ -42,6 +42,7 @@
 #include <gsknn.h>
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
+#include <stdlib.h>
 #include <gsknn_config.h>
 #include <gsknn_kernel.h>
 
@@ -49,7 +50,7 @@
 
 /*
  * --------------------------------------------------------------------------
- * @brief  Pack A into mr x kc x mc folded panels. Collect A using amap. 
+ * @brief  Pack A into mr x kc x mc folded panels. Collect A using amap.
  *
  * @param  m        Number of query points
  * @param  k        Min( remaining d, dc )
@@ -120,7 +121,7 @@ inline void packA_kcxmc_d(
 
 /*
  * --------------------------------------------------------------------------
- * @brief  Pack B into nr x kc x nc folded panels. Collect B using bmap. 
+ * @brief  Pack B into nr x kc x nc folded panels. Collect B using bmap.
  *
  * @param  n        Number of reference points
  * @param  k        Min( remaining d, dc )
@@ -139,7 +140,7 @@ inline void packB_kcxnc_s(
     float  *packB
     )
 {
-  int    j, p; 
+  int    j, p;
   float  *b_pntr[ SKNN_NR ];
 
   for ( j = 0; j < n; j ++ ) {
@@ -166,7 +167,7 @@ inline void packB_kcxnc_d(
     double *packB
     )
 {
-  int    j, p; 
+  int    j, p;
   double *b_pntr[ DKNN_NR ];
 
   for ( j = 0; j < n; j ++ ) {
@@ -193,7 +194,7 @@ inline void packB_kcxnc_d(
  * --------------------------------------------------------------------------
  * @brief  This macro-kernel contains the 3.rd and the 2.nd loop of the
  *         rank-k update.
- * 
+ *
  * @param  m        Number of query points
  * @param  n        Number of reference points
  * @param  k        Data point dimension
@@ -284,7 +285,7 @@ void rank_k_macro_kernel_d(
  * @brief  This macro-kernel further partitions packC into mr x nr blocks.
  *         Each block computes the remaining rank-k update, square distances
  *         and directly performs heap select to update the neighbor lists.
- * 
+ *
  * @param  m        Number of query points
  * @param  n        Number of reference points
  * @param  k        Data point dimension
@@ -302,7 +303,7 @@ void rank_k_macro_kernel_d(
  * @param  *I       Neighbor lists (value, global indicies)
  * @param  ldr      Leading dimension of D and I
  * --------------------------------------------------------------------------
- */ 
+ */
 void sgsknn_macro_kernel_row(
     int    m,
     int    n,
@@ -447,7 +448,7 @@ void dsq2nrm_macro_kernel(
   aux.pc     = pc;
   aux.b_next = packB;
 
-  //printf( "here, pc = %d, last = %d, ldc = %d, m = %d, n = %d, k %d\n", 
+  //printf( "here, pc = %d, last = %d, ldc = %d, m = %d, n = %d, k %d\n",
   //    pc, lastiter, ldc, m, n , k );
 
   for ( j = 0; j < n; j += DKNN_NR ) {
@@ -577,7 +578,7 @@ void dgssq2nrm(
             packA2 + tid * DKNN_MC,
             packB,
             packB2,
-            &C[ jc * ldc + ic ], 
+            &C[ jc * ldc + ic ],
             ldc,
             pc,
             ( pc + DKNN_KC >= k )
@@ -643,12 +644,12 @@ void dgsknn_var3(
     //heap_sort( m, r, &C[ j * ldc ], amap, &D[ j * r ], &I[ j * r ] );
     //heapSelect_dheap( m, r, &C[ j * ldc ], amap, &D[ j * ldr ], &I[ j * ldr ] );
     ( *kselect ) (
-        m, 
-        r, 
-        &C[ j * ldc ], 
-        amap, 
-        &D[ j * ldr ], 
-        &I[ j * ldr ] 
+        m,
+        r,
+        &C[ j * ldc ],
+        amap,
+        &D[ j * ldr ],
+        &I[ j * ldr ]
         );
   }
   time_heap = omp_get_wtime() - beg;
@@ -661,7 +662,7 @@ void dgsknn_var3(
 
 /*
  *
- */ 
+ */
 void sgsknn_var1(
     int    m,
     int    n,
@@ -799,7 +800,7 @@ void sgsknn_var1(
                 &packC[ ic * padn ], // packed
                 ( ( ib - 1 ) / SKNN_MR + 1 ) * SKNN_MR, // packed
                 pc,
-                D      + ic * ldr, // D is m x ldr (d-array heap) 
+                D      + ic * ldr, // D is m x ldr (d-array heap)
                 I      + ic * ldr, // I is m x ldr (d-array heap)
                 ldr
                 );
@@ -864,7 +865,7 @@ void sgsknn_var1(
               NULL,
               0,
               pc,
-              D      + ic * ldr, // D is m x ldr (d-array heap) 
+              D      + ic * ldr, // D is m x ldr (d-array heap)
               I      + ic * ldr, // I is m x ldr (d-array heap)
               ldr
               );
@@ -1021,7 +1022,7 @@ void dgsknn_var1(
                 &packC[ ic * padn ], // packed
                 ( ( ib - 1 ) / DKNN_MR + 1 ) * DKNN_MR, // packed
                 pc,
-                D      + ic * ldr, // D is m x ldr (d-array heap) 
+                D      + ic * ldr, // D is m x ldr (d-array heap)
                 I      + ic * ldr, // I is m x ldr (d-array heap)
                 ldr
                 );
@@ -1086,7 +1087,7 @@ void dgsknn_var1(
               NULL,
               0,
               pc,
-              D      + ic * ldr, // D is m x ldr (d-array heap) 
+              D      + ic * ldr, // D is m x ldr (d-array heap)
               I      + ic * ldr, // I is m x ldr (d-array heap)
               ldr
               );
